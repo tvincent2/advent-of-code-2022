@@ -6,7 +6,7 @@ struct Elf {
 }
 
 fn main() {
-    let file_name = "input/day-1";
+    let file_name = "input/day-01";
     // let data = fs::read_to_string(file_name).unwrap();
     // println!("{}", data);
     // let elves: Vec<&str> = data.split("\n\n").collect();
@@ -37,4 +37,11 @@ fn main() {
 
     let max = elves.iter().map(|elf| elf.energies.iter().sum::<u32>()).max();
     println!("{:?}", max);
+
+    let mut sums = elves.iter().map(|elf| elf.energies.iter().sum::<u32>()).collect::<Vec<u32>>();
+    sums.sort();
+    sums.reverse();
+    println!("{:?}", sums);
+    sums.truncate(3);
+    println!("{:?}", sums.iter().sum::<u32>());
 }
