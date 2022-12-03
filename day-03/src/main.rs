@@ -96,6 +96,22 @@ impl RuckSack {
         let common_item = self.common_item();
         letter_to_priority(common_item)
     }
+
+    fn zip_compartments(&self) -> String {
+        format!("{}{}", self.compartment1, self.compartment2)
+    }
+}
+
+fn common_item(rucksack1: &RuckSack, rucksack2: &RuckSack, rucksack3: &RuckSack) -> char {
+    let fullsack1 = rucksack1.zip_compartments();
+    let fullsack2 = rucksack2.zip_compartments();
+    let fullsack3 = rucksack3.zip_compartments();
+    for item in fullsack1.chars() {
+        if fullsack2.contains(item) && fullsack3.contains(item) {
+            return item;
+        }
+    }
+    unreachable!()
 }
 
 fn main() {
@@ -110,11 +126,23 @@ fn main() {
 
     let sum_of_priorities: u32 = rucksacks.iter().map(|rucksack| rucksack.priority()).sum();
     println!("Sum of priorities: {}", sum_of_priorities);
+
+    let sum_of_priorities_by_three: u32 = rucksacks
+        .chunks_exact(3)
+        .map(|chunk| {
+            if chunk.len() != 3 {
+                unreachable!()
+            } else {
+                letter_to_priority(common_item(&chunk[0], &chunk[1], &chunk[2]))
+            }
+        })
+        .sum();
+    println!("Sum of priorities by 3: {}", sum_of_priorities_by_three);
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::RuckSack;
+    use crate::{common_item, RuckSack};
 
     #[test]
     fn rucksack_from_string() {
@@ -139,5 +167,25 @@ mod tests {
         let rucksack = RuckSack::from(input);
 
         assert_eq!(rucksack.priority(), 16);
+    }
+
+    #[test]
+    fn rucksack_zip_compartment() {
+        let input = "vJrwpWtwJgWrhcsFMMfFFhFp".to_string();
+        let rucksack = RuckSack::from(input);
+
+        assert_eq!(
+            rucksack.zip_compartments(),
+            "vJrwpWtwJgWrhcsFMMfFFhFp".to_string()
+        );
+    }
+
+    #[test]
+    fn find_common_item_in_rucksacks() {
+        let rucksack1 = RuckSack::from("vJrwpWtwJgWrhcsFMMfFFhFp".to_string());
+        let rucksack2 = RuckSack::from("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL".to_string());
+        let rucksack3 = RuckSack::from("PmmdzqPrVvPwwTWBwg".to_string());
+
+        assert_eq!(common_item(&rucksack1, &rucksack2, &rucksack3), 'r');
     }
 }
